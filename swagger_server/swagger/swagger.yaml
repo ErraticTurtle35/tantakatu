@@ -1,0 +1,1422 @@
+openapi: 3.0.0
+info:
+  title: Tantakatu API
+  description: This is the first attempt for create API for Tantakatu
+  contact:
+    name: Gabriel Morales
+    email: gabs2323@outlook.com
+  license:
+    name: Gabriel Morales
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/Erraticturtle35/Tantakatu/1.0.0
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: users
+  description: Everything about your users
+- name: country
+  description: Everything about the countries
+- name: currency
+  description: Everything about currencies $$$
+- name: posting
+  description: Everything about your posting
+- name: posting_categories
+  description: Everything about your posting categories
+paths:
+  /users:
+    post:
+      tags:
+      - users
+      summary: Create user
+      operationId: create_user
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /users/{username}:
+    get:
+      tags:
+      - users
+      summary: Get user by name
+      operationId: get_user_by_name
+      parameters:
+      - name: username
+        in: path
+        description: The name thats needs to be fetched. Use user1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid username supplied
+        404:
+          description: User not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    put:
+      tags:
+      - users
+      summary: Updates users
+      description: This is only can be done by the logged in user
+      operationId: update_user
+      parameters:
+      - name: username
+        in: path
+        description: name that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Update user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        400:
+          description: Invalid user supplied
+        404:
+          description: User not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    delete:
+      tags:
+      - users
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: delete_user
+      parameters:
+      - name: username
+        in: path
+        description: The name that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid username supplied
+        404:
+          description: User not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /users/login:
+    get:
+      tags:
+      - users
+      summary: Logs user into the system
+      operationId: login_user
+      parameters:
+      - name: username
+        in: query
+        description: the user name for the login
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: The password for the current user
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              style: simple
+              explode: false
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              style: simple
+              explode: false
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+        400:
+          description: Invalid username/password supplied
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /users/logout:
+    get:
+      tags:
+      - users
+      summary: Log  out current logged user
+      operationId: logout_user
+      responses:
+        default:
+          description: Successful operation
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /users/{user_id}/roles:
+    post:
+      tags:
+      - users
+      summary: Create a role for the user
+      operationId: create_user_role
+      parameters:
+      - name: user_id
+        in: path
+        description: The user_id thats needs a new role. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRole'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /users/roles/{role_id}:
+    get:
+      tags:
+      - users
+      summary: Get role by name
+      operationId: get_user_role_by_id
+      parameters:
+      - name: role_id
+        in: path
+        description: The id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRole'
+        400:
+          description: Invalid role id supplied
+        404:
+          description: role not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    put:
+      tags:
+      - users
+      summary: Updates role
+      description: This is only can be done by the logged in user
+      operationId: update_user_role
+      parameters:
+      - name: role_id
+        in: path
+        description: id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update role object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRole'
+        required: true
+      responses:
+        400:
+          description: Invalid role id supplied
+        404:
+          description: role not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    delete:
+      tags:
+      - users
+      summary: Delete role
+      description: This can only be done by the logged in user.
+      operationId: delete_user_role
+      parameters:
+      - name: role_id
+        in: path
+        description: The role id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid role id supplied
+        404:
+          description: role not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /roles:
+    post:
+      tags:
+      - users
+      summary: Create roles
+      operationId: create_role
+      requestBody:
+        description: Created role object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /roles/{role_id}:
+    get:
+      tags:
+      - users
+      summary: Get role by id
+      operationId: get_role_by_id
+      parameters:
+      - name: role_id
+        in: path
+        description: The id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Invalid role id supplied
+        404:
+          description: role not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    put:
+      tags:
+      - users
+      summary: Updates role
+      description: This is only can be done by the logged in user
+      operationId: update_role
+      parameters:
+      - name: role_id
+        in: path
+        description: id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update role object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+        required: true
+      responses:
+        400:
+          description: Invalid role id supplied
+        404:
+          description: role not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    delete:
+      tags:
+      - users
+      summary: Delete role
+      description: This can only be done by the logged in user.
+      operationId: delete_role
+      parameters:
+      - name: role_id
+        in: path
+        description: The role id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid role id supplied
+        404:
+          description: role not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /roles/permissions/:
+    post:
+      tags:
+      - users
+      summary: Create permission
+      operationId: create_permission
+      requestBody:
+        description: Created permission object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePermission'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /roles/permissions/{permission_id}:
+    get:
+      tags:
+      - users
+      summary: Get permission by id
+      operationId: get_permission_by_id
+      parameters:
+      - name: permission_id
+        in: path
+        description: The id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        400:
+          description: Invalid permission id supplied
+        404:
+          description: permission not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    put:
+      tags:
+      - users
+      summary: Updates permission
+      description: This is only can be done by the logged in user
+      operationId: update_permission
+      parameters:
+      - name: permission_id
+        in: path
+        description: id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update role object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Permission'
+        required: true
+      responses:
+        400:
+          description: Invalid permission id supplied
+        404:
+          description: permission not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+    delete:
+      tags:
+      - users
+      summary: Delete permission
+      description: This can only be done by the logged in user.
+      operationId: delete_permission
+      parameters:
+      - name: permission_id
+        in: path
+        description: The permission id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid permission id supplied
+        404:
+          description: permission not found
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /countries:
+    post:
+      tags:
+      - country
+      summary: Create a country
+      operationId: create_country
+      requestBody:
+        description: Created country object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Country'
+        required: true
+      responses:
+        default:
+          description: successful operation!
+      x-openapi-router-controller: swagger_server.controllers.country_controller
+  /countries/{country_id}:
+    get:
+      tags:
+      - country
+      summary: Get user by name
+      operationId: get_county_by_id
+      parameters:
+      - name: country_id
+        in: path
+        description: The id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Country'
+        400:
+          description: Invalid country id supplied
+        404:
+          description: Country not found
+      x-openapi-router-controller: swagger_server.controllers.country_controller
+    put:
+      tags:
+      - country
+      summary: Updates country
+      description: This is only can be done by the logged in user
+      operationId: update_country
+      parameters:
+      - name: country_id
+        in: path
+        description: id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update Country object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Country'
+        required: true
+      responses:
+        400:
+          description: Invalid country id supplied
+        404:
+          description: Country not found
+      x-openapi-router-controller: swagger_server.controllers.country_controller
+    delete:
+      tags:
+      - country
+      summary: Delete country
+      description: This can only be done by the logged in user.
+      operationId: delete_country
+      parameters:
+      - name: country_id
+        in: path
+        description: The country id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid country id supplied
+        404:
+          description: Country not found
+      x-openapi-router-controller: swagger_server.controllers.country_controller
+  /currencies:
+    post:
+      tags:
+      - currency
+      summary: Create currency
+      operationId: create_currency
+      requestBody:
+        description: Created currency object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+  /currencies/{currency_id}:
+    get:
+      tags:
+      - currency
+      summary: Get currency by id
+      operationId: get_currency_by_id
+      parameters:
+      - name: currency_id
+        in: path
+        description: The currency_id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        400:
+          description: Invalid currency supplied
+        404:
+          description: Currency not found
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+    put:
+      tags:
+      - currency
+      summary: Updates currency
+      description: This is only can be done by the logged in user
+      operationId: update_currency
+      parameters:
+      - name: currency_id
+        in: path
+        description: currency_id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update currency object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+        required: true
+      responses:
+        400:
+          description: Invalid currency supplied
+        404:
+          description: Currency not found
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+    delete:
+      tags:
+      - currency
+      summary: Delete currency
+      description: This can only be done by the logged in user.
+      operationId: delete_currency
+      parameters:
+      - name: currency_id
+        in: path
+        description: The currency_id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        400:
+          description: Invalid currency supplied
+        404:
+          description: Currency not found
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+  /currencies/{currency_id}/rate:
+    post:
+      tags:
+      - currency
+      summary: Create currency rate
+      operationId: create_currency_rate
+      parameters:
+      - name: currency_id
+        in: path
+        description: The currency_id thats needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Created a currency object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyRate'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+  /currencies/rate/{rate_id}:
+    get:
+      tags:
+      - currency
+      summary: Get currency rate by id
+      operationId: get_currency_rate_id
+      parameters:
+      - name: rate_id
+        in: path
+        description: The rate_id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyRate'
+        400:
+          description: Invalid currency supplied
+        404:
+          description: Currency not found
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+    put:
+      tags:
+      - currency
+      summary: Updates currency rate
+      description: This is only can be done by the logged in user
+      operationId: update_currency_rate
+      parameters:
+      - name: rate_id
+        in: path
+        description: rate_id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update currency rate object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyRate'
+        required: true
+      responses:
+        400:
+          description: Invalid rate supplied
+        404:
+          description: rate not found
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+    delete:
+      tags:
+      - currency
+      summary: Delete currency rate
+      description: This can only be done by the logged in user.
+      operationId: delete_currency_rate
+      parameters:
+      - name: rate_id
+        in: path
+        description: The rate_id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        400:
+          description: Invalid rate supplied
+        404:
+          description: rate not found
+      x-openapi-router-controller: swagger_server.controllers.currency_controller
+  /posting:
+    post:
+      tags:
+      - posting
+      summary: Create posting
+      operationId: create_posting
+      requestBody:
+        description: Created posting object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Posting'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+  /posting/{posting_id}:
+    get:
+      tags:
+      - posting
+      summary: Get posting by id
+      operationId: get_posting_by_id
+      parameters:
+      - name: posting_id
+        in: path
+        description: The posting_id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posting'
+        400:
+          description: Invalid posting supplied
+        404:
+          description: posting not found
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+    put:
+      tags:
+      - posting
+      summary: Updates posting
+      description: This is only can be done by the logged in user
+      operationId: update_posting
+      parameters:
+      - name: posting_id
+        in: path
+        description: posting_id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update posting object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Posting'
+        required: true
+      responses:
+        400:
+          description: Invalid posting supplied
+        404:
+          description: Posting not found
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+    delete:
+      tags:
+      - posting
+      summary: Delete posting
+      description: This can only be done by the logged in user.
+      operationId: delete_posting
+      parameters:
+      - name: posting_id
+        in: path
+        description: The posting_id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        400:
+          description: Invalid posting supplied
+        404:
+          description: posting not found
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+  /posting/{posting_id}/publish:
+    post:
+      tags:
+      - posting
+      summary: Publish the posting
+      operationId: publish_posting
+      parameters:
+      - name: posting_id
+        in: path
+        description: The posting_id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Publish posting object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Posting'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+  /posting/{posting_id}/sell:
+    post:
+      tags:
+      - posting
+      summary: Sell posting
+      operationId: sell_posting
+      parameters:
+      - name: posting_id
+        in: path
+        description: The posting_id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: sell posting object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Posting'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+  /posting/gallery:
+    post:
+      tags:
+      - posting
+      summary: Create posting photo
+      operationId: create_posting_photo
+      requestBody:
+        description: Created posting object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostingPhotoGallery'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+  /posting/gallery/{photo_id}:
+    get:
+      tags:
+      - posting
+      summary: Get posting photo by id
+      operationId: get_posting_photo_by_id
+      parameters:
+      - name: photo_id
+        in: path
+        description: The photo thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingPhotoGallery'
+        400:
+          description: Invalid currency supplied
+        404:
+          description: Currency not found
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+    put:
+      tags:
+      - posting
+      summary: Updates posting photo
+      description: This is only can be done by the logged in user
+      operationId: update_posting_photo
+      parameters:
+      - name: photo_id
+        in: path
+        description: photo_id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update photo rate object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostingPhotoGallery'
+        required: true
+      responses:
+        400:
+          description: Invalid photo supplied
+        404:
+          description: photo not found
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+    delete:
+      tags:
+      - posting
+      summary: Delete posting photo
+      description: This can only be done by the logged in user.
+      operationId: delete_posting_photo
+      parameters:
+      - name: photo_id
+        in: path
+        description: The photo that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        400:
+          description: Invalid photo supplied
+        404:
+          description: photo not found
+      x-openapi-router-controller: swagger_server.controllers.posting_controller
+  /postingCategories:
+    post:
+      tags:
+      - posting_categories
+      summary: Create a posting category
+      operationId: create_posting_category
+      requestBody:
+        description: Created category object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostingCategory'
+        required: true
+      responses:
+        default:
+          description: successful operation
+      x-openapi-router-controller: swagger_server.controllers.posting_categories_controller
+  /postingCategories/{category_id}:
+    get:
+      tags:
+      - posting_categories
+      summary: Get category by id
+      operationId: get_posting_category_by_id
+      parameters:
+      - name: category_id
+        in: path
+        description: The category_id thats needs to be fetched. Use 1 for testing
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingCategory'
+        400:
+          description: Invalid category supplied
+        404:
+          description: category not found
+      x-openapi-router-controller: swagger_server.controllers.posting_categories_controller
+    put:
+      tags:
+      - posting_categories
+      summary: Updates posting
+      description: This is only can be done by the logged in user
+      operationId: update_posting_category
+      parameters:
+      - name: category_id
+        in: path
+        description: category_id that needs to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Update category object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostingCategory'
+        required: true
+      responses:
+        400:
+          description: Invalid category supplied
+        404:
+          description: category not found
+      x-openapi-router-controller: swagger_server.controllers.posting_categories_controller
+    delete:
+      tags:
+      - posting_categories
+      summary: Delete category
+      description: This can only be done by the logged in user.
+      operationId: delete_posting_category
+      parameters:
+      - name: category_id
+        in: path
+        description: The category_id that needs to be deleted
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        400:
+          description: Invalid posting category supplied
+        404:
+          description: posting category not found
+      x-openapi-router-controller: swagger_server.controllers.posting_categories_controller
+components:
+  schemas:
+    User:
+      required:
+      - id
+      - login
+      - password
+      - username
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+        country_id:
+          type: string
+        active:
+          type: boolean
+          default: true
+      example:
+        password: password
+        active: true
+        id: 0
+        login: login
+        country_id: country_id
+        username: username
+    Country:
+      required:
+      - code
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        code:
+          type: string
+        currency_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+          default: true
+      example:
+        code: code
+        name: name
+        active: true
+        id: 0
+        currency_id: 6
+    Currency:
+      required:
+      - code
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        active:
+          type: boolean
+          default: true
+      example:
+        code: code
+        active: true
+        id: 0
+    CurrencyRate:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        price:
+          type: number
+        date:
+          type: string
+          format: date
+        active:
+          type: boolean
+          default: true
+        currency_id:
+          type: integer
+          format: int64
+      example:
+        date: 2000-01-23
+        price: 6.027456183070403
+        active: true
+        id: 0
+        currency_id: 1
+    UserRole:
+      required:
+      - id
+      - role_id
+      - user_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        role_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+          default: true
+      example:
+        user_id: 6
+        role_id: 1
+        active: true
+        id: 0
+    Role:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+          default: true
+      example:
+        name: name
+        description: description
+        active: true
+        id: 0
+    RolePermission:
+      required:
+      - id
+      - permission_id
+      - role_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        role_id:
+          type: integer
+          format: int64
+        permission_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+          default: true
+    Permission:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+          default: true
+      example:
+        name: name
+        description: description
+        active: true
+        id: 0
+    Party:
+      required:
+      - email
+      - first_name
+      - id
+      - last_name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        user_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+          default: true
+    Posting:
+      required:
+      - category_id
+      - currency_id
+      - id
+      - posting_type
+      - sales_price
+      - title
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        sales_price:
+          type: number
+        currency_id:
+          type: integer
+          format: int64
+        posting_type:
+          type: string
+          default: fixed_sales_price
+          enum:
+          - fixed_sales_price
+          - negotiable_sales_price
+          - on_request_sales_price
+        state:
+          type: string
+          default: draft
+          enum:
+          - draft
+          - published
+          - selled
+        category_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+          default: true
+      example:
+        category_id: 5
+        sales_price: 6.027456183070403
+        posting_type: fixed_sales_price
+        description: description
+        active: true
+        id: 0
+        state: draft
+        title: title
+        currency_id: 1
+    PostingPhotoGallery:
+      required:
+      - id
+      - image_path
+      - posting_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        posting_id:
+          type: integer
+          format: int64
+        image_path:
+          type: string
+        active:
+          type: boolean
+          default: true
+      example:
+        image_path: image_path
+        active: true
+        posting_id: 6
+        id: 0
+    PostingCategory:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        parent_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+          default: true
+      example:
+        parent_id: 6
+        name: name
+        description: description
+        active: true
+        id: 0
+
